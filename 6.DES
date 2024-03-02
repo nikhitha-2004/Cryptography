@@ -1,69 +1,59 @@
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdint.h>
 
-void encryptVigenere(char plaintext[], char key[]);
-void decryptVigenere(char ciphertext[], char key[]);
+// Initial and final permutation tables
+int initial_permutation[] = {58, 50, 42, 34, 26, 18, 10, 2,
+                             60, 52, 44, 36, 28, 20, 12, 4,
+                             62, 54, 46, 38, 30, 22, 14, 6,
+                             64, 56, 48, 40, 32, 24, 16, 8,
+                             57, 49, 41, 33, 25, 17, 9, 1,
+                             59, 51, 43, 35, 27, 19, 11, 3,
+                             61, 53, 45, 37, 29, 21, 13, 5,
+                             63, 55, 47, 39, 31, 23, 15, 7};
+
+int final_permutation[] = {40, 8, 48, 16, 56, 24, 64, 32,
+                           39, 7, 47, 15, 55, 23, 63, 31,
+                           38, 6, 46, 14, 54, 22, 62, 30,
+                           37, 5, 45, 13, 53, 21, 61, 29,
+                           36, 4, 44, 12, 52, 20, 60, 28,
+                           35, 3, 43, 11, 51, 19, 59, 27,
+                           34, 2, 42, 10, 50, 18, 58, 26,
+                           33, 1, 41, 9, 49, 17, 57, 25};
+
+// Function prototypes
+void performInitialPermutation(uint64_t *data);
+void performFinalPermutation(uint64_t *data);
 
 int main() {
-    char plaintext[100], key[100], ciphertext[100];
+    // Example plaintext (64-bit)
+    uint64_t plaintext = 0x0123456789ABCDEF;
 
-    // Get the plaintext and key from the user
-    printf("Enter plaintext: ");
-    fgets(plaintext, sizeof(plaintext), stdin);
+    // Perform initial permutation
+    performInitialPermutation(&plaintext);
 
-    printf("Enter key: ");
-    fgets(key, sizeof(key), stdin);
+    // Perform final permutation
+    performFinalPermutation(&plaintext);
 
-    // Remove newline characters from input
-    strtok(plaintext, "\n");
-    strtok(key, "\n");
-
-    // Encrypt and display the result
-    encryptVigenere(plaintext, key);
-    printf("Encrypted text: %s\n", plaintext);
-
-    // Decrypt and display the result
-    decryptVigenere(plaintext, key);
-    printf("Decrypted text: %s\n", plaintext);
+    // Output the result
+    printf("Encrypted text: %llx\n", plaintext);
 
     return 0;
 }
 
-void encryptVigenere(char plaintext[], char key[]) {
-    int plainLen = strlen(plaintext);
-    int keyLen = strlen(key);
-
-    for (int i = 0; i < plainLen; i++) {
-        if (isalpha(plaintext[i])) {
-            // Adjust the key index based on the current character
-            int keyIndex = i % keyLen;
-
-            // Apply the Vigenere cipher to each character
-            if (isupper(plaintext[i])) {
-                plaintext[i] = 'A' + (plaintext[i] - 'A' + key[keyIndex] - 'A') % 26;
-            } else {
-                plaintext[i] = 'a' + (plaintext[i] - 'a' + key[keyIndex] - 'a') % 26;
-            }
-        }
+void performInitialPermutation(uint64_t *data) {
+    uint64_t result = 0;
+    for (int i = 0; i < 64; i++) {
+        result <<= 1;
+        result |= ((*data >> (64 - initial_permutation[i])) & 1);
     }
+    *data = result;
 }
 
-void decryptVigenere(char ciphertext[], char key[]) {
-    int cipherLen = strlen(ciphertext);
-    int keyLen = strlen(key);
-
-    for (int i = 0; i < cipherLen; i++) {
-        if (isalpha(ciphertext[i])) {
-            // Adjust the key index based on the current character
-            int keyIndex = i % keyLen;
-
-            // Apply the Vigenere cipher to each character
-            if (isupper(ciphertext[i])) {
-                ciphertext[i] = 'A' + (ciphertext[i] - key[keyIndex] + 26) % 26;
-            } else {
-                ciphertext[i] = 'a' + (ciphertext[i] - key[keyIndex] + 26) % 26;
-            }
-        }
+void performFinalPermutation(uint64_t *data) {
+    uint64_t result = 0;
+    for (int i = 0; i < 64; i++) {
+        result <<= 1;
+        result |= ((*data >> (64 - final_permutation[i])) & 1);
     }
+    *data = result;
 }
