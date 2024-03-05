@@ -1,0 +1,51 @@
+#include<stdio.h>
+#include<string.h>
+#include<math.h>
+int gcd(int a, int b) 
+	{
+        if (b == 0) 
+	       return a;
+        return gcd(b, a % b);
+    }
+int main()
+{
+	int n,n1,e,p,q,f,d,r,M,C;
+	long long int s;
+	printf("enter the first prime number: ");
+	scanf("%d",&p);
+	printf("enter the second prime number: ");
+	scanf("%d",&q);
+	n=p*q;
+	printf("\nthe n value:%d",n);
+	n1=(p-1)*(q-1);
+	printf("\nthe n1 value:%d",n1);
+	for(e=2;e<n1;e++)
+	{
+		if(gcd(e,n1)==1)
+		{
+			printf("\nthe e value:%d",e);
+			break;
+		}
+	}
+	for(d=2;d<n1;d++)
+	{
+		if(e*d%n1==1)
+		{
+	    printf("the d value is %d",d);
+	   }
+	}
+	printf("\nEncryption");
+	printf("\nthe m value: ");
+	scanf("%d",&M);
+	r=pow(M,e);
+	C=r%n;
+	printf("\nthe cipher text value is %d",C);
+	printf("\nDecryption");
+	s=pow(C,d);
+	printf("the power %d",s);
+	M=s%n;
+	printf("the plain text value is %d",M);
+	
+	
+	
+}
